@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from vk_api import VKAPI
+from tqdm import tqdm
 
 def main():
     # Load VK API token from the keys.env file
@@ -26,7 +27,15 @@ def main():
 
     if user_info is not None:
         print("User Information:")
-        print(user_info)
+        print(f"First Name: {user_info.first_name}")
+        print(f"Last Name: {user_info.last_name}")
+        print(f"id: {user_info.user_vk_id}")
+        print(f"Birthday: {user_info.bdate}")
+        print(f"Sex: {user_info.sex}")
+        print(f"City: {user_info.city['title']}")
+        print("-----------------------------")
+        print("There is a search for a pair for the user...")
+        print("---------------------------------------------")
 
         # Calculate age using the provided birthdate
         age = user_info.calculate_age()
@@ -55,9 +64,13 @@ def main():
             return
 
         if search_results:
-            print("Search Results:")
-            for result in search_results:
-                print(result)
+            total_users = len(search_results)
+            print(f"The search is over, the number of users of the opposite sex is found: {total_users}")
+
+            with open('vk_users.json', 'w', encoding='utf-8') as file:
+                for user in tqdm(search_results):
+                    # Write user data to the JSON file
+                    file.write(str(user) + "\n")
         else:
             print("No users found matching the search criteria.")
     else:

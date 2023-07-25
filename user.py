@@ -19,3 +19,7 @@ class User:
             age = today.year - bdate.year - ((today.month, today.day) < (bdate.month, bdate.day))
             return age
         return None
+
+    def is_data_complete(self):
+        required_fields = [self.bdate, self.sex, self.city]
+        return all(field is not None for field in required_fields)
