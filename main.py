@@ -14,9 +14,17 @@ def main():
 
     # Example Usage
     user_id = "813472314"  # Replace with the VK user ID you want to search for
-    user_info = vk_api.get_user_info_by_id(user_id)
 
-    if user_info:
+    try:
+        user_info = vk_api.get_user_info_by_id(user_id)
+    except ConnectionError as ce:
+        print(f"Connection Error: {ce}")
+        return
+    except ValueError as ve:
+        print(f"Value Error: {ve}")
+        return
+
+    if user_info is not None:
         print("User Information:")
         print(user_info)
 
@@ -37,7 +45,14 @@ def main():
         }
 
         # Search users based on the modified search parameters
-        search_results = vk_api.search_users(search_params, user_info)
+        try:
+            search_results = vk_api.search_users(search_params, user_info)
+        except ConnectionError as ce:
+            print(f"Connection Error while searching users: {ce}")
+            return
+        except ValueError as ve:
+            print(f"Value Error while searching users: {ve}")
+            return
 
         if search_results:
             print("Search Results:")
