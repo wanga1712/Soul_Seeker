@@ -11,9 +11,10 @@ class VKAPI:
     MAX_REQUESTS_PER_SECOND = 3
     MAX_PHOTOS_PER_USER = 1000
 
-    def __init__(self, access_token):
-        self.access_token = access_token
+    def __init__(self, vk_access_token):
+        self.access_token = vk_access_token
         self.session = requests.Session()
+
 
     def _make_request(self, method, params):
         url = f"{self.BASE_URL}{method}"
