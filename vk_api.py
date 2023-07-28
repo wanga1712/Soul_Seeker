@@ -225,7 +225,7 @@ class VKAPI:
             host="localhost",
             database="postgres",
             user="postgres",
-            password="05321983"
+            password=""
         )
 
         try:
