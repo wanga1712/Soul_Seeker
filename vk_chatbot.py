@@ -1,30 +1,57 @@
-import re
+import datetime
 
-class VKChatBot:
-    def __init__(self, vk_api):
-        self.vk_api = vk_api
+class User:
+    def __init__(self, user_vk_id, first_name, last_name, sex, bdate, city):
+        """
+        Инициализирует объект User с информацией о пользователе.
 
-    def handle_message(self, message):
-        # Extract user ID from the incoming message
-        user_id = self.extract_user_id_from_message(message)
+        Параметры:
+            user_vk_id (int): VK ID пользователя.
+            first_name (str): Имя пользователя.
+            last_name (str): Фамилия пользователя.
+            sex (int): Пол пользователя (1 - мужской, 2 - женский).
+            bdate (str): Дата рождения пользователя в формате "дд.мм.гггг".
+            city (dict): Словарь с информацией о городе пользователя.
 
-        if user_id is None:
-            print("Error: Failed to extract user ID from the message.")
-            return
+        Возвращает:
+            None
+        """
+        self.user_vk_id = user_vk_id
+        self.first_name = first_name
+        self.last_name = last_name
+        self.sex = sex
+        self.bdate = bdate
+        self.city = city
 
-        try:
-            self.vk_api.clear_database()  # Step 1: Clear the existing database
-            self.vk_api.get_user_and_search_pairs(user_id)  # Steps 2, 3, 4, and 5: Get user info, search pairs, get photos, and save to database
-        except Exception as e:
-            print(f"Error during the main process: {e}")
+    def __repr__(self):
+        """
+        Возвращает строковое представление объекта User.
 
-    def extract_user_id_from_message(self, message):
-        # Use regular expression to find the user ID in the message
-        # Assuming the message format is like: "find me a pair user_id123456789"
-        pattern = r"user_id(\d+)"
-        match = re.search(pattern, message)
+        Возвращает:
+            str: Строковое представление объекта User.
+        """
+        return f"{self.first_name} {self.last_name} {self.user_vk_id} {self.bdate} {self.city}"
 
-        if match:
-            return match.group(1)
-        else:
-            return None
+    def calculate_age(self):
+        """
+        Рассчитывает возраст пользователя на основе указанной даты рождения.
+
+        Возвращает:
+            int: Возраст пользователя или None, если дата рождения недоступна.
+        """
+        if self.bdate:
+            bdate = datetime.datetime.strptime(self.bdate, "%d.%m.%Y")
+            today = datetime.date.today()
+            age = today.year - bdate.year - ((today.month, today.day) < (bdate.month, bdate.day))
+            return age
+        return None
+
+    def is_data_complete(self):
+        """
+        Проверяет, содержит ли объект User полную информацию о пользователе.
+
+        Возвращает:
+            bool: True, если информация полная, и False в противном случае.
+        """
+        required_fields = [self.bdate, self.sex, self.city]
+        return all(field is not None for field in required_fields)

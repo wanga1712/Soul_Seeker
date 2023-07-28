@@ -1,38 +1,39 @@
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
 from vk_api import VKAPI
-from vk_chatbot import VKChatBot
 
 def main():
-    # Load VK API token from the keys.env file
+    """
+    Основной скрипт для запуска чат-бота VKinder.
+
+    Использует токен VK API, который должен быть задан в файле keys.env.
+    Создает экземпляр VKAPI для взаимодействия с API VK и обработки сообщений.
+    Запускает прослушивание входящих сообщений от пользователей.
+
+    Raises:
+        ValueError: Если VK_API_TOKEN не найден в переменных окружения.
+    """
+    # Загрузка токена VK API из файла keys.env
     load_dotenv(dotenv_path=r'C:\Users\wangr\PycharmProjects\pythonProject7\keys.env')
-    vk_access_token = os.getenv('VK_API_TOKEN')
-    if not vk_access_token:
-        raise ValueError("VK_API_TOKEN not found in environment variables.")
+    vk_app_access_token = os.getenv('VK_API_TOKEN')
 
-    # Create VKAPI instance with the loaded token
-    vk_api = VKAPI(vk_access_token)
+    # Подтверждение токена VK API
+    if not vk_app_access_token:
+        raise ValueError("VK_API_TOKEN не найден в переменных окружения.")
 
-    # Create VKChatBot instance with the VKAPI
-    vk_chatbot = VKChatBot(vk_api)
+    # Создание экземпляра VKAPI
+    vk_api = VKAPI(vk_app_access_token)
 
-    # Example Usage: Simulate a message from the VK group
-    incoming_message = "find me a pair"
+    try:
+        # Запуск прослушивания сообщений от пользователей
+        while True:
+            vk_api.listen_for_messages()
 
-    # Step 1: Receive a message from the user and handle it
-    user_id = vk_chatbot.handle_message(incoming_message)
+    except ValueError as ve:
+        print(f"Ошибка: {ve}")
+    except Exception as e:
+        print(f"Произошла неизвестная ошибка: {e}")
 
-    # Step 2: Get data about the user using the received user ID
-    user_info = vk_api.get_user_info_by_id(user_id)
-
-    # Step 3: Search for a pair for the user based on the parameters
-    search_results = vk_api.search_pairs_for_user(user_info)
-
-    # Step 4: Get photos from the albums of eligible users
-    eligible_users_photos = vk_api.get_photos_of_eligible_users(search_results)
-
-    # Step 5: Save photos and data of the received users in PostgreSQL
-    vk_api.save_data_and_photos_to_postgres(user_info, search_results, eligible_users_photos)
 
 if __name__ == "__main__":
     main()

@@ -26,17 +26,15 @@ vk_chatbot_api = VKAPI(vk_chatbot_access_token)
 app = Flask(__name__)
 
 # Create the VKChatBot instance with the VKAPI for the chatbot
-vk_chatbot = VKChatBot(vk_chatbot_api)
+vk_chatbot = VKChatBot()
 
 @app.route("/", methods=["POST"])
 def handle_message():
-    data = request.json
-    if data.get("type") == "message_new":
-        message = data.get("object", {}).get("message", {}).get("text")
-        if message:
-            vk_chatbot.handle_message(message)
-    elif data.get("type") == "confirmation":
-        return "cc0b5b06"  # Return the correct confirmation code
+    data = request.data.decode('utf-8')  # Get the raw string data from the request
+    vk_chatbot.set_vk_api_instance(vk_chatbot_api)  # Set the VKAPI instance for the VKChatBot
+    vk_chatbot.handle_message(data)  # Pass the raw string data to the chatbot for processing
+
+    # Respond with a success message
     return jsonify({"status": "ok"})
 
 if __name__ == "__main__":
